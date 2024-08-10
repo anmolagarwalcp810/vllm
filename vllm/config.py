@@ -955,6 +955,8 @@ class SpeculativeConfig:
         speculative_draft_tensor_parallel_size: Optional[int],
         num_speculative_tokens: Optional[int],
         speculative_max_model_len: Optional[int],
+        speculative_rope_scaling: Optional[dict],
+        speculative_rope_theta: Optional[float],
         enable_chunked_prefill: bool,
         use_v2_block_manager: bool,
         disable_log_stats: bool,
@@ -1019,6 +1021,12 @@ class SpeculativeConfig:
                 If set to False, token log probabilities are returned
                 according to the log probability settings in SamplingParams.
                 If not specified, it defaults to True.
+            speculative_rope_scaling (Optional[dict]): Dictionary containing
+                the scaling configuration for the RoPE embeddings. When using 
+                this flag, don't update `max_position_embeddings` to the 
+                expected new maximum.
+            speculative_rope_theta (Optional[float]): The theta parameter for
+                the RoPE embeddings.
     
         Returns:
             Optional["SpeculativeConfig"]: An instance of SpeculativeConfig if
@@ -1088,6 +1096,8 @@ class SpeculativeConfig:
                 max_seq_len_to_capture=target_model_config.
                 max_seq_len_to_capture,
                 max_logprobs=target_model_config.max_logprobs,
+                rope_scaling=speculative_rope_scaling,
+                rope_theta=speculative_rope_theta,
             )
 
             draft_hf_config = draft_model_config.hf_config

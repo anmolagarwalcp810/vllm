@@ -110,6 +110,8 @@ class EngineArgs:
     num_speculative_tokens: Optional[int] = None
     speculative_max_model_len: Optional[int] = None
     speculative_disable_by_batch_size: Optional[int] = None
+    speculative_rope_scaling: Optional[dict] = None
+    speculative_rope_theta: Optional[float] = None
     ngram_prompt_lookup_max: Optional[int] = None
     ngram_prompt_lookup_min: Optional[int] = None
     spec_decoding_acceptance_method: str = 'rejection_sampler'
@@ -558,6 +560,21 @@ class EngineArgs:
             'if the number of enqueue requests is larger than this value.')
 
         parser.add_argument(
+            '--speculative-rope-scaling',
+            default=EngineArgs.speculative_rope_scaling,
+            type=json.loads,
+            help='RoPE scaling configuration in JSON format. '
+            'For example, {"type":"dynamic","factor":2.0}')
+        
+        parser.add_argument(
+            '--speculative-rope-theta',
+            default=EngineArgs.speculative_rope_theta,
+            type=float,
+            help='RoPE theta. Use with `rope_scaling`. In '
+            'some cases, changing the RoPE theta improves the '
+            'performance of the scaled model.')
+
+        parser.add_argument(
             '--ngram-prompt-lookup-max',
             type=int,
             default=EngineArgs.ngram_prompt_lookup_max,
@@ -806,6 +823,8 @@ class EngineArgs:
             speculative_disable_by_batch_size=self.
             speculative_disable_by_batch_size,
             speculative_max_model_len=self.speculative_max_model_len,
+            speculative_rope_scaling=self.speculative_rope_scaling,
+            speculative_rope_theta=self.speculative_rope_theta,
             enable_chunked_prefill=self.enable_chunked_prefill,
             use_v2_block_manager=self.use_v2_block_manager,
             disable_log_stats=self.disable_log_stats,
